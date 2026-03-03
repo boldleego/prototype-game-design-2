@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=4 uid="uid://bo60r05viny80"]
+
+[ext_resource type="Script" path="res://scripts/shield_root.gd" id="1_ksdxa"]
+[ext_resource type="PackedScene" path="res://scenes/shield_tile.tscn" id="2_h0s04"]
+
+[node name="ShieldRoot" type="Node3D"]
+script = ExtResource("1_ksdxa")
+tile_scene = ExtResource("2_h0s04")

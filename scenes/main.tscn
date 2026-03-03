@@ -1,0 +1,104 @@
+[gd_scene format=3 uid="uid://clhmt8lemi4ra"]
+
+[ext_resource type="Script" uid="uid://djd0ffsrhwt87" path="res://scripts/player_ship.gd" id="1_1i40l"]
+
+[sub_resource type="Environment" id="Environment_fby8q"]
+background_mode = 1
+background_color = Color(0.0470588, 0.0666667, 0.0941176, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.721569, 0.792157, 0.890196, 1)
+ambient_light_energy = 0.8
+
+[sub_resource type="SphereMesh" id="SphereMesh_3em11"]
+radius = 6.0
+height = 12.0
+
+[sub_resource type="Shader" id="Shader_vfx82"]
+code = "shader_type spatial;\nrender_mode cull_back, diffuse_burley, specular_schlick_ggx;\n\nuniform vec4 color_a : source_color = vec4(0.12, 0.18, 0.25, 1.0);\nuniform vec4 color_b : source_color = vec4(0.78, 0.86, 0.95, 1.0);\nuniform float checker_scale = 14.0;\nuniform float emission_strength = 0.15;\n\nvoid fragment() {\n\tvec2 grid = floor(UV * checker_scale);\n\tfloat checker = mod(grid.x + grid.y, 2.0);\n\tvec3 base = mix(color_a.rgb, color_b.rgb, checker);\n\tALBEDO = base;\n\tROUGHNESS = 0.75;\n\tEMISSION = base * emission_strength;\n}\n"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_hn0b1"]
+shader = SubResource("Shader_vfx82")
+
+[sub_resource type="TorusMesh" id="TorusMesh_qcl7h"]
+inner_radius = 0.22
+outer_radius = 2.1
+rings = 12
+ring_segments = 48
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ngkyf"]
+transparency = 1
+albedo_color = Color(0.94902, 0.509804, 0.341176, 0.45)
+roughness = 0.35
+emission_enabled = true
+emission = Color(0.94902, 0.431373, 0.223529, 1)
+emission_energy_multiplier = 1.15
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_71kwv"]
+size = Vector2(26, 34)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_h0gsl"]
+albedo_color = Color(0.278431, 0.333333, 0.392157, 1)
+emission_enabled = true
+emission = Color(0.139216, 0.166667, 0.196078, 1)
+emission_energy_multiplier = 0.35
+
+[sub_resource type="BoxMesh" id="BoxMesh_jl8g5"]
+size = Vector3(1.2, 0.8, 1.8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4hm6i"]
+albedo_color = Color(0.258824, 0.85098, 0.878431, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_e4j7s"]
+top_radius = 0.4
+bottom_radius = 0.6
+height = 0.5
+
+[node name="Main" type="Node3D" unique_id=528229458]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=462662863]
+environment = SubResource("Environment_fby8q")
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1692795209]
+transform = Transform3D(1, 0, 0, 0, 0.66913056, 0.74314487, 0, -0.74314487, 0.66913056, 0, 17, 16)
+current = true
+fov = 45.0
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1121296841]
+transform = Transform3D(0.8660254, 0.40957603, -0.28678823, 0, 0.57357645, 0.81915206, 0.5, -0.7094065, 0.49673176, 0, 8, 0)
+light_energy = 2.2
+shadow_enabled = true
+
+[node name="OmniLight3D" type="OmniLight3D" parent="." unique_id=297300457]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, 4)
+light_energy = 1.6
+omni_range = 40.0
+
+[node name="Playfield" type="Node3D" parent="." unique_id=700402660]
+
+[node name="CenterSphere" type="MeshInstance3D" parent="Playfield" unique_id=1791051502]
+mesh = SubResource("SphereMesh_3em11")
+surface_material_override/0 = SubResource("ShaderMaterial_hn0b1")
+
+[node name="CoreRing" type="MeshInstance3D" parent="Playfield" unique_id=1868367038]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0)
+mesh = SubResource("TorusMesh_qcl7h")
+surface_material_override/0 = SubResource("StandardMaterial3D_ngkyf")
+
+[node name="Backdrop" type="MeshInstance3D" parent="Playfield" unique_id=1509525758]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 3.5, -15.5)
+mesh = SubResource("PlaneMesh_71kwv")
+surface_material_override/0 = SubResource("StandardMaterial3D_h0gsl")
+
+[node name="PlayerShip" type="Node3D" parent="Playfield" unique_id=940143352]
+transform = Transform3D(0.23069508, -0.9692625, 0.085498475, 0, -0.08786864, -0.9961321, 0.9730261, 0.22980277, -0.020270864, 0, 2.1, 11.8)
+script = ExtResource("1_1i40l")
+camera_path = NodePath("../../Camera3D")
+
+[node name="Body" type="MeshInstance3D" parent="Playfield/PlayerShip" unique_id=1190047460]
+mesh = SubResource("BoxMesh_jl8g5")
+surface_material_override/0 = SubResource("StandardMaterial3D_4hm6i")
+
+[node name="Nose" type="MeshInstance3D" parent="Playfield/PlayerShip" unique_id=1080373703]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -1.15)
+mesh = SubResource("CylinderMesh_e4j7s")
+surface_material_override/0 = SubResource("StandardMaterial3D_4hm6i")

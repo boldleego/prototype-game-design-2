@@ -1,0 +1,28 @@
+[gd_scene load_steps=5 format=4 uid="uid://b1v4ftr6df5vk"]
+
+[ext_resource type="Script" path="res://scripts/projectile.gd" id="1_hwjxt"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_7y16o"]
+radius = 0.18
+height = 0.36
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_by6a4"]
+albedo_color = Color(1, 0.956863, 0.592157, 1)
+emission_enabled = true
+emission = Color(1, 0.780392, 0.227451, 1)
+emission_energy_multiplier = 1.5
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_3jg6u"]
+radius = 0.2
+
+[node name="Projectile" type="Area3D"]
+script = ExtResource("1_hwjxt")
+monitoring = true
+monitorable = true
+
+[node name="Visual" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMesh_7y16o")
+surface_material_override/0 = SubResource("StandardMaterial3D_by6a4")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_3jg6u")
