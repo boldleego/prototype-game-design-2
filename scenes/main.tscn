@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://clhmt8lemi4ra"]
 
 [ext_resource type="Script" uid="uid://djd0ffsrhwt87" path="res://scripts/player_ship.gd" id="1_1i40l"]
+[ext_resource type="Script" path="res://scripts/sphere_board.gd" id="2_1xbqf"]
 
 [sub_resource type="Environment" id="Environment_fby8q"]
 background_mode = 1
@@ -79,6 +80,9 @@ omni_range = 40.0
 mesh = SubResource("SphereMesh_3em11")
 surface_material_override/0 = SubResource("ShaderMaterial_hn0b1")
 
+[node name="SphereBoard" type="Node3D" parent="Playfield"]
+script = ExtResource("2_1xbqf")
+
 [node name="CoreRing" type="MeshInstance3D" parent="Playfield" unique_id=1868367038]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0)
 mesh = SubResource("TorusMesh_qcl7h")
@@ -93,12 +97,14 @@ surface_material_override/0 = SubResource("StandardMaterial3D_h0gsl")
 transform = Transform3D(0.23069508, -0.9692625, 0.085498475, 0, -0.08786864, -0.9961321, 0.9730261, 0.22980277, -0.020270864, 0, 2.1, 11.8)
 script = ExtResource("1_1i40l")
 camera_path = NodePath("../../Camera3D")
+sphere_board_path = NodePath("../SphereBoard")
 
 [node name="Body" type="MeshInstance3D" parent="Playfield/PlayerShip" unique_id=1190047460]
+transform = Transform3D(0.35, 0, 0, 0, 0.35, 0, 0, 0, 0.35, 0, 0, 0)
 mesh = SubResource("BoxMesh_jl8g5")
 surface_material_override/0 = SubResource("StandardMaterial3D_4hm6i")
 
 [node name="Nose" type="MeshInstance3D" parent="Playfield/PlayerShip" unique_id=1080373703]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -1.15)
+transform = Transform3D(0.35, 0, 0, 0, 0.35, 0, 0, 0, 0.35, 0, 0.035, -0.4)
 mesh = SubResource("CylinderMesh_e4j7s")
 surface_material_override/0 = SubResource("StandardMaterial3D_4hm6i")

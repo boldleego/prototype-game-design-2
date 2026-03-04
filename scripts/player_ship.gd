@@ -4,6 +4,7 @@ extends Node3D
 @export var orbit_move_speed: float = 10.0
 @export var frame_roll_speed: float = 2.1
 @export var camera_path: NodePath
+@export var sphere_board_path: NodePath
 @export var camera_distance: float = 4.8
 @export var camera_height: float = 1.8
 @export var camera_lerp_speed: float = 6.0
@@ -14,10 +15,13 @@ extends Node3D
 var _radial: Vector3 = Vector3(0.0, 0.18, 1.0).normalized()
 var _frame_roll: float = 0.0
 var _camera: Camera3D
+var _sphere_board: Node
+var _was_grab_pressed: bool = false
 
 
 func _ready() -> void:
 	_camera = get_node_or_null(camera_path) as Camera3D
+	_sphere_board = get_node_or_null(sphere_board_path)
 	_radial = global_position.normalized()
 	if _radial.is_zero_approx():
 		_radial = Vector3(0.0, 0.18, 1.0).normalized()
@@ -38,6 +42,8 @@ func _process(delta: float) -> void:
 		var tangent_move: Vector3 = (rotated_right * movement_input.x) + (rotated_up * movement_input.y)
 		_radial = (_radial + tangent_move * (orbit_move_speed / orbit_radius) * delta).normalized()
 	_update_orbit_transform(delta, false)
+	_update_mouse_hover()
+	_update_grab_input()
 
 
 func _update_orbit_transform(delta: float, snap_camera: bool) -> void:
@@ -58,6 +64,37 @@ func _update_orbit_transform(delta: float, snap_camera: bool) -> void:
 		var weight: float = clampf(delta * camera_lerp_speed, 0.0, 1.0)
 		_camera.global_position = _camera.global_position.lerp(desired_camera_position, weight)
 	_camera.look_at(Vector3.ZERO, Vector3.UP)
+
+
+func _update_mouse_hover() -> void:
+	if _sphere_board == null or _camera == null:
+		return
+	if _sphere_board.has_method("update_hover_from_camera"):
+		var target_empty := false
+		if _sphere_board.has_method("has_active_grab") and _sphere_board.has_method("is_collecting_grab"):
+			target_empty = _sphere_board.has_active_grab() and not _sphere_board.is_collecting_grab()
+		_sphere_board.update_hover_from_camera(_camera, _radial, get_viewport().get_mouse_position(), target_empty)
+
+
+func _update_grab_input() -> void:
+	if _sphere_board == null:
+		return
+
+	var is_grab_pressed: bool = Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT)
+	if is_grab_pressed and not _was_grab_pressed:
+		if _sphere_board.has_method("has_active_grab") and _sphere_board.has_method("is_collecting_grab") and _sphere_board.has_active_grab() and not _sphere_board.is_collecting_grab():
+			if _sphere_board.has_method("place_held_tiles"):
+				_sphere_board.place_held_tiles()
+		elif _sphere_board.has_method("begin_grab"):
+			_sphere_board.begin_grab()
+	elif is_grab_pressed and _was_grab_pressed:
+		if _sphere_board.has_method("is_collecting_grab") and _sphere_board.is_collecting_grab() and _sphere_board.has_method("update_grab"):
+			_sphere_board.update_grab()
+	elif not is_grab_pressed and _was_grab_pressed:
+		if _sphere_board.has_method("is_collecting_grab") and _sphere_board.is_collecting_grab() and _sphere_board.has_method("end_grab"):
+			_sphere_board.end_grab()
+
+	_was_grab_pressed = is_grab_pressed
 
 
 func _get_tangent_basis() -> Array[Vector3]:
